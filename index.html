@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>統測試題考生複習系統｜第8章 電腦網路的組成與通訊協定</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --danger-border: #fecaca;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+      --purple: #7c3aed;
+      --purple-hover: #6d28d9;
+      --purple-bg: #f5f3ff;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --radius: 14px;
+      --shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.65;
+      padding-bottom: 90px;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: #ffffff;
+      padding: 28px 20px;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.18);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .title-group h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .title-group p {
+      font-size: 0.9rem;
+      color: #dbeafe;
+    }
+
+    .progress-box {
+      background: rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(8px);
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      min-width: 210px;
+    }
+
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #38bdf8;
+      border-radius: 99px;
+      transition: width 0.25s ease;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 980px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    /* Score Dashboard (Hidden until graded) */
+    .score-dashboard {
+      display: none;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--primary);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .score-dashboard.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .score-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .score-main {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .score-number {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .score-unit {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .score-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .stat-badge {
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-badge.correct {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    .stat-badge.wrong {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    .stat-badge.unanswered {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border: 1px solid var(--warning-border);
+    }
+
+    /* Filter & Quick Nav */
+    .toolbar {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .filter-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: var(--text-main);
+      padding: 6px 13px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover {
+      background: #e2e8f0;
+    }
+
+    .filter-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* Question Grid Navigator */
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+      gap: 6px;
+      margin-top: 14px;
+      width: 100%;
+    }
+
+    .nav-dot {
+      height: 34px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .nav-dot:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .nav-dot.answered {
+      background: var(--primary-light);
+      border-color: #93c5fd;
+      color: var(--primary);
+    }
+
+    .nav-dot.graded-correct {
+      background: var(--success-bg);
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .nav-dot.graded-wrong {
+      background: var(--danger-bg);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    /* Question Cards */
+    .question-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .question-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      box-shadow: var(--shadow);
+      border: 1.5px solid var(--border);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      scroll-margin-top: 110px;
+    }
+
+    .question-card.graded-correct {
+      border-color: var(--success);
+    }
+
+    .question-card.graded-wrong {
+      border-color: var(--danger);
+    }
+
+    .q-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .q-title {
+      font-size: 1.06rem;
+      font-weight: 700;
+      color: var(--text-main);
+      flex: 1;
+    }
+
+    .q-num {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 2px 9px;
+      border-radius: 6px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .q-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .q-source {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #475569;
+      background: #f1f5f9;
+      padding: 3px 10px;
+      border-radius: 99px;
+      border: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .q-status-badge {
+      display: none;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+
+    .q-status-badge.correct {
+      display: inline-block;
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    .q-status-badge.wrong {
+      display: inline-block;
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    .q-status-badge.unanswered {
+      display: inline-block;
+      background: var(--warning-bg);
+      color: var(--warning);
+      border: 1px solid var(--warning-border);
+    }
+
+    /* Options */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: #fcfcfd;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .option-label:hover {
+      border-color: #93c5fd;
+      background: var(--primary-light);
+    }
+
+    .option-label input[type="radio"] {
+      margin-top: 4px;
+      accent-color: var(--primary);
+      transform: scale(1.15);
+      cursor: pointer;
+    }
+
+    .option-label.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      font-weight: 600;
+    }
+
+    .option-label.correct-answer {
+      border-color: var(--success) !important;
+      background: var(--success-bg) !important;
+      color: #065f46;
+      font-weight: 700;
+    }
+
+    .option-label.wrong-selected {
+      border-color: var(--danger) !important;
+      background: var(--danger-bg) !important;
+      color: #991b1b;
+    }
+
+    .opt-code {
+      font-weight: 700;
+      color: var(--primary);
+      min-width: 28px;
+    }
+
+    .option-label.correct-answer .opt-code {
+      color: var(--success);
+    }
+
+    .option-label.wrong-selected .opt-code {
+      color: var(--danger);
+    }
+
+    .opt-text {
+      flex: 1;
+      word-break: break-word;
+    }
+
+    /* Explanation Box (Password Protected) */
+    .explanation-box {
+      display: none;
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-radius: 10px;
+      background: var(--purple-bg);
+      border-left: 4px solid var(--purple);
+      color: #2e1065;
+      font-size: 0.94rem;
+    }
+
+    .explanation-box.visible {
+      display: block;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .exp-title {
+      font-weight: 800;
+      color: var(--purple);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Sticky Action Footer */
+    .action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      padding: 14px 20px;
+      box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.06);
+      z-index: 99;
+    }
+
+    .action-bar-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      border: none;
+      padding: 11px 20px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.18s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-purple {
+      background: var(--purple);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn-purple:hover {
+      background: var(--purple-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      color: var(--text-main);
+      border: 1.5px solid #cbd5e1;
+    }
+
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    /* Password Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 16px;
+      padding: 26px 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-card h3 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .modal-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .pwd-input {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 1.05rem;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      outline: none;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    .pwd-input:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+    }
+
+    .pwd-error {
+      display: none;
+      color: var(--danger);
+      font-size: 0.86rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .header-inner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .action-bar-inner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .btn-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .btn {
+        flex: 1;
+        justify-content: center;
+        padding: 10px 12px;
+        font-size: 0.88rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="title-group">
+        <h1>📘 數位科技概論｜統測試題考生複習系統</h1>
+        <p>第8章 電腦網路的組成與通訊協定（共 30 題・選項順序已重新調換）</p>
+      </div>
+      <div class="progress-box">
+        <div class="progress-text">
+          <span>作答進度</span>
+          <span id="progressCount">0 / 30 題</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- 計分結果儀表板 -->
+    <section class="score-dashboard" id="scoreDashboard">
+      <div class="score-header">
+        <div>
+          <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">測驗計分結果</div>
+          <div class="score-main">
+            <span class="score-number" id="scoreValue">0</span>
+            <span class="score-unit">分（滿分 100 分）</span>
+          </div>
+        </div>
+        <div class="score-stats">
+          <div class="stat-badge correct">✅ 答對：<span id="correctCount">0</span> 題</div>
+          <div class="stat-badge wrong">❌ 答錯：<span id="wrongCount">0</span> 題</div>
+          <div class="stat-badge unanswered">⚠️ 未答：<span id="unansweredCount">0</span> 題</div>
+        </div>
+      </div>
+      <div style="margin-top: 14px; font-size: 0.92rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <span id="scoreFeedback">已完成計分！您可以檢視下方各題作答結果，或點擊「查看詳細說明」輸入密碼解鎖完整解析。</span>
+      </div>
+    </section>
+
+    <!-- 題號快速導覽與篩選列 -->
+    <section class="toolbar">
+      <div class="filter-group">
+        <span style="font-size: 0.88rem; font-weight: 700; color: var(--text-muted);">題目篩選：</span>
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">全部題目 (30)</button>
+        <button class="filter-btn" data-filter="unanswered" onclick="setFilter('unanswered')">未作答</button>
+        <button class="filter-btn" data-filter="wrong" id="filterWrongBtn" onclick="setFilter('wrong')" style="display:none;">僅看錯題／未答</button>
+      </div>
+      <div style="font-size: 0.84rem; color: var(--text-muted);">
+        💡 點擊下方題號可快速跳至該題
+      </div>
+      <div class="nav-grid" id="navGrid"></div>
+    </section>
+
+    <!-- 試題列表 -->
+    <section class="question-list" id="questionList"></section>
+  </main>
+
+  <!-- 底部操作列 -->
+  <footer class="action-bar">
+    <div class="action-bar-inner">
+      <div class="btn-group">
+        <button class="btn btn-primary" id="gradeBtn" onclick="gradeExam()">
+          📝 執行計分（批改試卷）
+        </button>
+        <button class="btn btn-purple" id="explainBtn" onclick="handleExplanationButton()">
+          🔒 查看詳細說明（密碼保護）
+        </button>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="shuffleAndReset()">
+          🔀 重新洗牌選項並重考
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 密碼驗證彈出視窗 -->
+  <div class="modal-overlay" id="passwordModal">
+    <div class="modal-card">
+      <h3>🔐 請輸入密碼解鎖詳細說明</h3>
+      <p>查看 30 題統測試題的完整解析需要密碼驗證，請輸入教師／系統密碼：</p>
+      <input
+        type="password"
+        id="passwordInput"
+        class="pwd-input"
+        placeholder="請輸入密碼..."
+        autocomplete="off"
+      />
+      <div class="pwd-error" id="passwordError">❌ 密碼錯誤，請確認後重新輸入！</div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closePasswordModal()">取消</button>
+        <button class="btn btn-purple" onclick="verifyPassword()">確認解鎖</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * 30 題統測試題資料庫
+     * 題目文字與 content.md 完全一致，且預設選項順序皆已與原題目卷 (A)(B)(C)(D) 不同！
+     */
+    const QUESTION_BANK = [
+      {
+        id: 1,
+        question: "下列哪一種通信媒體最適用於長距離直線傳播？",
+        source: "102商管群",
+        // 原順序: (A)廣播無線電波 (B)紅外線 (C)微波 (D)紫外線。 -> 改為: 紅外線、微波、紫外線、廣播無線電波
+        options: ["紅外線", "微波", "紫外線。", "廣播無線電波"],
+        answer: "微波",
+        explanation: "【正解：微波】微波（Microwave）頻率高、波長短，具有強烈的直線傳播（Line-of-Sight）特性，廣泛應用於長距離地面微波中繼站與人造衛星通訊。紅外線僅適合短距離直線傳輸（如遙控器）；廣播無線電波則為全向性傳播，可繞射障礙物。"
+      },
+      {
+        id: 2,
+        question: "電子郵件的傳輸協定SMTP、POP3、IMAP，是屬於下列哪一層的傳輸協定？",
+        source: "102商管群",
+        // 原順序: (A)應用層 (B)傳輸層 (C)網路層 (D)鏈結層。 -> 改為: 傳輸層、網路層、應用層、鏈結層。
+        options: ["傳輸層", "網路層", "應用層", "鏈結層。"],
+        answer: "應用層",
+        explanation: "【正解：應用層】SMTP（傳送郵件）、POP3（下載接收郵件）與 IMAP（線上存取管理郵件）皆是直接提供給電子郵件應用程式使用的通訊協定，因此在 OSI 七層模型與 TCP/IP 模型中皆屬於最高層「應用層（Application Layer）」。"
+      },
+      {
+        id: 3,
+        question: "在OSI參考模型（Open System Interconnection Reference Model）的七層架構中，下列哪一層主要負責規範各項網路服務的使用者介面？",
+        source: "103商管群",
+        // 原順序: (A)應用層 (B)會議層 (C)網路層 (D)傳輸層。 -> 改為: 會議層、傳輸層。、網路層、應用層
+        options: ["會議層", "傳輸層。", "網路層", "應用層"],
+        answer: "應用層",
+        explanation: "【正解：應用層】OSI 第 7 層「應用層（Application Layer）」是唯一直接與使用者及應用程式互動的層級，負責規範各項網路應用服務（如 HTTP、FTP、Telnet、SMTP 等）及使用者介面。"
+      },
+      {
+        id: 4,
+        question: "下列有關網路設備的敘述，何者正確？",
+        source: "104工管類",
+        // 原順序: (A)交換器... (B)橋接器... (C)路由器... (D)集線器...
+        options: [
+          "路由器（router）可連通多個不同類型的區域網路",
+          "交換器（switch）內有MAC表記錄封包的來源IP位址",
+          "集線器（hub）只能連接電腦不能直接連接路由器。",
+          "橋接器（bridge）可連通不同區域網路的多部電腦"
+        ],
+        answer: "路由器（router）可連通多個不同類型的區域網路",
+        explanation: "【正解：路由器（router）可連通多個不同類型的區域網路】解析：(1) 交換器（Switch）的 MAC 表記錄的是「MAC 實體位址」而非 IP 位址；(2) 橋接器（Bridge）主要用於連接相同型態的區域網路網段並過濾訊框；(3) 路由器（Router）運作於網路層，可連接多個不同類型或不同網段的區域網路（LAN）與廣域網路（WAN）；(4) 集線器（Hub）可以連接電腦，也可以連接路由器或交換器。"
+      },
+      {
+        id: 5,
+        question: "在OSI網路架構中，確保資料於接收端能依發送端的編序正確組合的是屬於哪一層？",
+        source: "104工管類",
+        // 原順序: (A)資料鏈結層 (B)網路層 (C)傳輸層 (D)應用層。
+        options: ["網路層", "傳輸層", "應用層。", "資料鏈結層"],
+        answer: "傳輸層",
+        explanation: "【正解：傳輸層】OSI 第 4 層「傳輸層（Transport Layer，如 TCP 協定）」負責將大型資料切割並加上序號（Sequence Number），並在接收端依據序號重新正確組合，同時提供流量控制與錯誤重傳機制。"
+      },
+      {
+        id: 6,
+        question: "於瀏覽器輸入www.edu.tw網址就可順利地連到該網站，這需要下列何種伺服器來提供網址轉換服務？",
+        source: "104工管類",
+        // 原順序: (A)DNS (B)WWW (C)FTP (D)MAIL。
+        options: ["WWW", "FTP", "DNS", "MAIL。"],
+        answer: "DNS",
+        explanation: "【正解：DNS】DNS（Domain Name System，網域名稱系統）伺服器負責將人類易讀的網域名稱（如 www.edu.tw）解析並轉換為電腦網路連線所需的 IP 位址。"
+      },
+      {
+        id: 7,
+        question: "路由器的路徑選擇能力可完成OSI中哪一層功能？",
+        source: "104工管類",
+        // 原順序: (A)網路層 (B)應用層 (C)實體層 (D)表達層。
+        options: ["實體層", "表達層。", "應用層", "網路層"],
+        answer: "網路層",
+        explanation: "【正解：網路層】路由器（Router）根據封包的 IP 位址進行邏輯定址與路徑選擇（Routing），這是 OSI 第 3 層「網路層（Network Layer）」的核心功能。"
+      },
+      {
+        id: 8,
+        question: "在OSI模型中，網路卡功能最高屬於下列哪一層？",
+        source: "104工管類",
+        // 原順序: (A)實體層 (B)資料鏈結層 (C)網路層 (D)應用層。
+        options: ["網路層", "實體層", "應用層。", "資料鏈結層"],
+        answer: "資料鏈結層",
+        explanation: "【正解：資料鏈結層】網路卡（NIC）同時涵蓋 OSI 第 1 層（實體層：處理光電訊號收發）與第 2 層（資料鏈結層：具備 MAC 位址並處理訊框 Frame），因此功能最高屬於「資料鏈結層」。"
+      },
+      {
+        id: 9,
+        question: "下列有關電腦網路的敘述，何者錯誤？",
+        source: "104資電類",
+        // 原順序: (A) TCP/IP... (B) 集線器... (C) 路由器... (D) 在Windows...
+        options: [
+          "在Windows作業系統的電腦上，可利用「ipconfig/all」指令查得本機在網路上的MAC位址編號、IP位址等資訊。",
+          "路由器（Router）主要工作在OSI的實體層，通常作為信號放大與整波之用",
+          "TCP/IP為用在Internet中的通訊協定",
+          "集線器（Hub）工作在OSI的實體層，通常是用來管理網路設備的最小單位"
+        ],
+        answer: "路由器（Router）主要工作在OSI的實體層，通常作為信號放大與整波之用",
+        explanation: "【正解：路由器（Router）主要工作在OSI的實體層，通常作為信號放大與整波之用】路由器（Router）主要工作在 OSI 的「網路層（第 3 層）」，負責路徑選擇；工作在實體層（第 1 層）作為信號放大與整波之用的設備是「中繼器（Repeater）」或「集線器（Hub）」。"
+      },
+      {
+        id: 10,
+        question: "下列何者最適合用來連接LAN（Local Area Network）與Internet，並能根據IP位址來傳送封包？",
+        source: "105商管群",
+        // 原順序: (A)路由器 (B)中繼器 (C)集線器 (D)瀏覽器
+        options: [
+          "中繼器（Repeater）",
+          "集線器（Hub）",
+          "路由器（Router）",
+          "瀏覽器（Browser）。"
+        ],
+        answer: "路由器（Router）",
+        explanation: "【正解：路由器（Router）】路由器（Router）工作於 OSI 網路層，能夠識別 IP 位址並決定最佳路徑，最適合用來連接區域網路（LAN）與網際網路（Internet）。"
+      },
+      {
+        id: 11,
+        question: "當透過電腦網路下載檔案至個人電腦時，下列何種方式，最有可能會使下載者的個人電腦在邏輯上同時扮演用戶端（client）與伺服器端（server）的角色？",
+        source: "105商管群",
+        // 原順序: (A)HTTP下載 (B)FTP下載 (C)SMTP下載 (D)P2P下載。
+        options: ["FTP下載", "P2P下載。", "HTTP下載", "SMTP下載"],
+        answer: "P2P下載。",
+        explanation: "【正解：P2P下載。】P2P（Peer-to-Peer，點對點／對等式網路）傳輸架構中，每台個人電腦既向其他節點下載資料（扮演 Client 用戶端），同時也上傳分享已下載的資料片段給其他節點（扮演 Server 伺服器端）。"
+      },
+      {
+        id: 12,
+        question: "在OSI七層網路通訊協定中，哪一層是負責端點資料的正確送達？",
+        source: "105工管類",
+        // 原順序: (A)資料鏈結層 (B)會議層 (C)實體層 (D)傳輸層。
+        options: ["傳輸層。", "資料鏈結層", "實體層", "會議層"],
+        answer: "傳輸層。",
+        explanation: "【正解：傳輸層。】傳輸層（Transport Layer，第 4 層）負責端點對端點（End-to-End）的連線控制、流量控制、錯誤偵測與重傳，確保資料在發送端與接收端之間正確送達。"
+      },
+      {
+        id: 13,
+        question: "下列何者是個人電腦自伺服器接收E-mail時所採用的通訊協定？",
+        source: "105資電類",
+        // 原順序: (A)POP3 (B)FTP (C)SMTP (D)DNS。
+        options: ["SMTP", "DNS。", "POP3", "FTP"],
+        answer: "POP3",
+        explanation: "【正解：POP3】POP3（Post Office Protocol v3，郵局協定第三版）是個人電腦從郵件伺服器接收（下載）電子郵件時使用的協定；SMTP 則是寄信與伺服器間傳送郵件的協定。"
+      },
+      {
+        id: 14,
+        question: "網路OSI模型第二層的交換器（Switch）設備，依據下列哪種位址來轉換及傳送訊框（Frame）？",
+        source: "106商管群",
+        // 原順序: (A)實體位址（MAC） (B)網路位址（IP） (C)電腦名稱（Hostname） (D)群組名稱（Groupname）。
+        options: [
+          "網路位址（IP）",
+          "電腦名稱（Hostname）",
+          "群組名稱（Groupname）。",
+          "實體位址（MAC）"
+        ],
+        answer: "實體位址（MAC）",
+        explanation: "【正解：實體位址（MAC）】OSI 第二層（資料鏈結層）的交換器（Switch）內部維護 MAC 位址表，並依據網路卡的「實體位址（MAC Address）」來精準轉發訊框（Frame）。"
+      },
+      {
+        id: 15,
+        question: "下列敘述何者正確？",
+        source: "106商管群",
+        // 原順序: (A)IEEE 802.11... (B)TCP... (C)POP3... (D)SMTP...
+        options: [
+          "TCP是一種網路層的協定",
+          "IEEE 802.11是一種無線區域網路的標準",
+          "SMTP負責郵件伺服器與用戶端之間的電子郵件下載。",
+          "POP3負責郵件伺服器間郵件的傳送"
+        ],
+        answer: "IEEE 802.11是一種無線區域網路的標準",
+        explanation: "【正解：IEEE 802.11是一種無線區域網路的標準】解析：IEEE 802.11 即常見的 Wi-Fi 無線區域網路（WLAN）標準。其他選項錯誤原因：TCP 是「傳輸層」協定；SMTP 負責郵件「寄送與伺服器間傳送」；POP3 負責將郵件從伺服器「下載接收」至用戶端。"
+      },
+      {
+        id: 16,
+        question: "下列哪一種伺服器最適合用來將網域名稱轉換成IP位址？",
+        source: "106工管類",
+        // 原順序: (A)DNS Server (B)IIS Server (C)DHCP Server (D)NAT Server。
+        options: ["DHCP Server", "NAT Server。", "DNS Server", "IIS Server"],
+        answer: "DNS Server",
+        explanation: "【正解：DNS Server】DNS Server（網域名稱伺服器）專門負責將網域名稱（Domain Name）與 IP 位址互相對應轉換；DHCP Server 負責動態分配 IP；NAT Server 負責私有 IP 與公有 IP 轉換；IIS Server 為微軟的網站伺服器軟體。"
+      },
+      {
+        id: 17,
+        question: "下列哪一種網路連接設備具有過濾封包的功能，可避免網路區段間的訊息干擾，提高網路傳輸效率？",
+        source: "106工管類",
+        // 原順序: (A)橋接器 (B)中繼器 (C)集線器 (D)IP分享器。
+        options: ["中繼器", "集線器", "IP分享器。", "橋接器"],
+        answer: "橋接器",
+        explanation: "【正解：橋接器】橋接器（Bridge）運作在資料鏈結層，能檢查訊框的 MAC 位址並具備「過濾封包」功能，可將區域網路劃分為不同碰撞網段，避免跨區段的訊息干擾、提升傳輸效率。中繼器與集線器僅在實體層放大或廣播訊號，無過濾功能。"
+      },
+      {
+        id: 18,
+        question: "下列關於各種通訊協定的敘述，何者正確？",
+        source: "106工管類",
+        // 原順序: (A) TCP/IP... (B) Telnet... (C) IEEE802.11... (D) SMTP和POP3...
+        options: [
+          "SMTP和POP3協定是用於電子郵件的通訊協定，前者負責傳送，後者負責接收。",
+          "TCP/IP協定是廣泛運用在網際網路的通訊協定，在OSI架構中屬於網路層",
+          "IEEE802.11協定是專用於行動電話上網的通訊協定",
+          "Telnet協定是用於遠端登入的通訊協定，負責網路封包傳送，在OSI架構中屬於傳輸層"
+        ],
+        answer: "SMTP和POP3協定是用於電子郵件的通訊協定，前者負責傳送，後者負責接收。",
+        explanation: "【正解：SMTP和POP3協定是用於電子郵件的通訊協定，前者負責傳送，後者負責接收。】解析：(1) TCP 屬於傳輸層、IP 屬於網路層；(2) Telnet 屬於應用層；(3) IEEE 802.11 是無線區域網路（Wi-Fi）標準，非行動電話蜂巢網路標準；(4) SMTP 負責寄信傳送、POP3 負責收信接收，完全正確。"
+      },
+      {
+        id: 19,
+        question: "下列關於開放式系統互連（Open System Interconnection, OSI）參考模型的描述，何者錯誤？",
+        source: "106資電類",
+        // 原順序: (A) 該模型是由ISO... (B) 該模型中的傳輸層... (C) 該模型中的資料連結層... (D) 該模型中的實體層...
+        options: [
+          "該模型是由ISO組織制定，是一個用來規範不同電腦系統之間進行通訊的原則",
+          "該模型中的資料連結層（Data Link Layer）負責工作包含「錯誤偵測及更正」",
+          "該模型中的傳輸層（Transport Layer）負責工作包含「決定封包傳送的最佳傳輸路徑」",
+          "該模型中的實體層（Physical Layer）相對應的設備包含有中繼器（Repeater）、集線器（Hub）。"
+        ],
+        answer: "該模型中的傳輸層（Transport Layer）負責工作包含「決定封包傳送的最佳傳輸路徑」",
+        explanation: "【正解：該模型中的傳輸層（Transport Layer）負責工作包含「決定封包傳送的最佳傳輸路徑」】「決定封包傳送的最佳傳輸路徑（Routing 路由選擇）」是第 3 層「網路層（Network Layer）」的工作，而非第 4 層傳輸層。"
+      },
+      {
+        id: 20,
+        question: "下列通訊網路相關的標準中，何者常被歸類為無線區域網路（WLAN）？",
+        source: "106資電類",
+        // 原順序: (A)RS485 (B)RS232 (C)IEEE 802.11 (D)IEEE 802.3。
+        options: ["IEEE 802.3。", "IEEE 802.11", "RS485", "RS232"],
+        answer: "IEEE 802.11",
+        explanation: "【正解：IEEE 802.11】IEEE 802.11 為無線區域網路（WLAN / Wi-Fi）標準；IEEE 802.3 為有線乙太網路（Ethernet）標準；RS232 與 RS485 則為串列通訊介面標準。"
+      },
+      {
+        id: 21,
+        question: "下列有關OSI（Open System Interconnection，開放系統連結）的敘述，何者正確？",
+        source: "107商管群",
+        // 原順序: (A) TCP... (B) IP... (C) 在OSI七層架構中，應用層... (D) 在OSI七層架構中，實體層...
+        options: [
+          "IP（Internet Protocol）的功能是對應OSI七層架構中的傳輸層（Transport Layer）",
+          "在OSI七層架構中，實體層（Physical Layer）負責將資料轉換成傳輸媒介所能傳遞的電子信號。",
+          "TCP（Transmission Control Protocol）的功能是對應OSI七層架構中的網路層（Network Layer）",
+          "在OSI七層架構中，應用層（Application Layer）負責資料格式的轉換"
+        ],
+        answer: "在OSI七層架構中，實體層（Physical Layer）負責將資料轉換成傳輸媒介所能傳遞的電子信號。",
+        explanation: "【正解：在OSI七層架構中，實體層（Physical Layer）負責將資料轉換成傳輸媒介所能傳遞的電子信號。】解析：TCP 對應「傳輸層」；IP 對應「網路層」；負責資料格式轉換、編碼、壓縮與加解密的是「表達層（Presentation Layer）」。"
+      },
+      {
+        id: 22,
+        question: "下列何者不是電腦網路的連結架構？",
+        source: "107工管類",
+        // 原順序: (A)環狀 (B)星狀 (C)匯流排 (D)對等狀。
+        options: ["星狀", "對等狀。", "匯流排", "環狀"],
+        answer: "對等狀。",
+        explanation: "【正解：對等狀。】常見的實體網路拓撲（連結架構）包含：星狀（Star）、環狀（Ring）、匯流排（Bus）、樹狀（Tree）與網狀（Mesh）。並無「對等狀」這種實體拓撲（對等式 Peer-to-Peer 是網路服務管理模式）。"
+      },
+      {
+        id: 23,
+        question: "OSI通訊標準中，哪一層是介於傳輸層與資料鏈結層之間？",
+        source: "107工管類",
+        // 原順序: (A)網路層 (B)表達層 (C)應用層 (D)實體層。
+        options: ["表達層", "實體層。", "網路層", "應用層"],
+        answer: "網路層",
+        explanation: "【正解：網路層】OSI 七層由下而上依序為：(1)實體層 → (2)資料鏈結層 → (3)網路層 → (4)傳輸層 → (5)會議層 → (6)表達層 → (7)應用層。因此介於第 4 層傳輸層與第 2 層資料鏈結層之間的是第 3 層「網路層」。"
+      },
+      {
+        id: 24,
+        question: "下列關於使用郵件軟體來收發電子郵件的通訊協定，哪一個敘述最正確？",
+        source: "107工管類",
+        // 原順序: (A)POP3...送出 (B)POP3...離線讀信 (C)SMTP...取回 (D)IMAP...自動全數刪除
+        options: [
+          "SMTP協定（Simple Mail Transfer Protocol）可以協助使用者將伺服器上的信件取回",
+          "IMAP協定（Internet Message Access Protocol）可以協助使用者在下載信件標題後，自動將郵件伺服器上的信件全數刪除。",
+          "POP3協定（Post Office Protocol）可以協助使用者將信件送出",
+          "POP3協定（Post Office Protocol）可讓郵件軟體在下載信件後，提供離線讀信的功能"
+        ],
+        answer: "POP3協定（Post Office Protocol）可讓郵件軟體在下載信件後，提供離線讀信的功能",
+        explanation: "【正解：POP3協定（Post Office Protocol）可讓郵件軟體在下載信件後，提供離線讀信的功能】解析：POP3 會將郵件從伺服器下載至本機電腦，下載後即可離線閱讀；寄送郵件使用的是 SMTP；IMAP 則是將信件保留在伺服器上供多裝置同步管理，不會在下載標題後自動全數刪除。"
+      },
+      {
+        id: 25,
+        question: "下列對於網路的拓墣（Topology）的描述，何者錯誤？",
+        source: "107資電類",
+        // 原順序: (A)匯流排... (B)樹狀... (C)環狀... (D)星狀...
+        options: [
+          "樹狀（Tree）的結構，可以形成封閉性迴路",
+          "環狀（Ring）結構網路上的節點依環形順序傳遞資料",
+          "星狀（Star）的結構，經常需要一個集線器（HUB）。",
+          "匯流排（Bus）結構適合廣播（Broadcast）的方式傳遞資料"
+        ],
+        answer: "樹狀（Tree）的結構，可以形成封閉性迴路",
+        explanation: "【正解：樹狀（Tree）的結構，可以形成封閉性迴路】樹狀（Tree）結構屬於階層式分支架構，任意兩個節點之間只有唯一路徑，絕對不會形成封閉性迴路（Ring 環狀或 Mesh 網狀才會形成封閉迴路）。"
+      },
+      {
+        id: 26,
+        question: "在網路通訊標準-開放系統連結（Open System Interconnection, OSI）七層分類中，最上層與最下層分別是：",
+        source: "107資電類",
+        // 原順序: (A)最上層為應用層... (B)最上層為表達層... (C)最上層為會議層... (D)最上層為實體層...
+        options: [
+          "最上層為表達層（Presentation Layer），最下層為資料鏈結層（Data Link Layer）",
+          "最上層為會議層（Session Layer），最下層為傳輸層（Transport Layer）",
+          "最上層為應用層（Application Layer），最下層為實體層（Physical Layer）",
+          "最上層為實體層（Physical Layer），最下層為網路層（Network Layer）。"
+        ],
+        answer: "最上層為應用層（Application Layer），最下層為實體層（Physical Layer）",
+        explanation: "【正解：最上層為應用層（Application Layer），最下層為實體層（Physical Layer）】OSI 七層模型最上層（第 7 層）為應用層（Application Layer），最下層（第 1 層）為實體層（Physical Layer）。"
+      },
+      {
+        id: 27,
+        question: "有關OSI（open system interconnection）模型之敘述，下列何者錯誤？",
+        source: "統測試題",
+        // 原順序: (A)OSI模型的第四層稱為傳輸層 (B)OSI模型一共有七層 (C)OSI模型是由國際標準組織（ISO）所提出的網路參考模型 (D)HTTP協定屬於OSI模型中的實體層協定。
+        options: [
+          "OSI模型一共有七層",
+          "HTTP協定屬於OSI模型中的實體層協定。",
+          "OSI模型的第四層稱為傳輸層",
+          "OSI模型是由國際標準組織（ISO）所提出的網路參考模型"
+        ],
+        answer: "HTTP協定屬於OSI模型中的實體層協定。",
+        explanation: "【正解：HTTP協定屬於OSI模型中的實體層協定。】HTTP（超文字傳輸協定）是全球資訊網（WWW）瀏覽網頁所使用的協定，屬於 OSI 第 7 層「應用層（Application Layer）」，而非第 1 層實體層。"
+      },
+      {
+        id: 28,
+        question: "下列哪一項代表網路卡實體位址（MAC Address）？",
+        source: "108工管類",
+        // 原順序: (A)https://tw.yahoo.com (B)00:16:E6:5B:58:60 (C)140.111.34.147 (D)2001:DB8:2DE::E13。
+        options: [
+          "140.111.34.147",
+          "2001:DB8:2DE::E13。",
+          "https://tw.yahoo.com",
+          "00:16:E6:5B:58:60"
+        ],
+        answer: "00:16:E6:5B:58:60",
+        explanation: "【正解：00:16:E6:5B:58:60】網路卡實體位址（MAC Address）長度為 48 位元（6 Bytes），通常以 6 組兩位十六進位數字（0-9、A-F）並以冒號或連字號分隔表示（如 00:16:E6:5B:58:60）。140.111.34.147 為 IPv4 位址；2001:DB8:2DE::E13 為 IPv6 位址；https://tw.yahoo.com 為 URL 網址。"
+      },
+      {
+        id: 29,
+        question: "下列哪一項網路設備適合用來建構無線區域網路？",
+        source: "108工管類",
+        // 原順序: (A)Access Point (B)Router (C)Gateway (D)Bridge。
+        options: ["Router", "Access Point", "Bridge。", "Gateway"],
+        answer: "Access Point",
+        explanation: "【正解：Access Point】Access Point（簡稱 AP，無線基地台／無線存取點）是專門用來提供無線訊號收發、建構無線區域網路（WLAN）並橋接有線網路的設備。"
+      },
+      {
+        id: 30,
+        question: "OSI通訊標準中，下列哪一層最靠近應用層？",
+        source: "108工管類",
+        // 原順序: (A)網路層 (B)表達層 (C)傳輸層 (D)會議層。
+        options: ["會議層。", "網路層", "表達層", "傳輸層"],
+        answer: "表達層",
+        explanation: "【正解：表達層】OSI 七層模型由上而下依序為：第 7 層應用層 → 第 6 層表達層（Presentation Layer） → 第 5 層會議層 → 第 4 層傳輸層 → 第 3 層網路層 → 第 2 層資料鏈結層 → 第 1 層實體層。因此最靠近應用層的是第 6 層「表達層」。"
+      }
+    ];
+
+    const OPTION_LABELS = ["(A)", "(B)", "(C)", "(D)"];
+    const PASSWORD_SECRET = "13579";
+
+    // 系統狀態
+    let userAnswers = {};      // { [questionId]: selectedOptionText }
+    let isGraded = false;      // 是否已執行計分
+    let isUnlocked = false;    // 是否已通過密碼驗證
+    let explanationsShown = false; // 是否正在顯示詳細說明
+    let currentFilter = "all"; // 'all' | 'unanswered' | 'wrong'
+
+    // 初始化渲染
+    function initExam() {
+      renderNavGrid();
+      renderQuestions();
+      updateProgress();
+    }
+
+    // 渲染題號快速導覽
+    function renderNavGrid() {
+      const grid = document.getElementById("navGrid");
+      grid.innerHTML = QUESTION_BANK.map(q => {
+        let cls = "nav-dot";
+        const ans = userAnswers[q.id];
+        if (isGraded) {
+          if (ans === q.answer) cls += " graded-correct";
+          else cls += " graded-wrong";
+        } else if (ans !== undefined) {
+          cls += " answered";
+        }
+        return `<button class="${cls}" onclick="scrollToQuestion(${q.id})" title="跳至第 ${q.id} 題">${q.id}</button>`;
+      }).join("");
+    }
+
+    // 渲染 30 道題目卡片
+    function renderQuestions() {
+      const list = document.getElementById("questionList");
+      list.innerHTML = QUESTION_BANK.map(q => {
+        const selected = userAnswers[q.id];
+        const isCorrect = selected === q.answer;
+        const isUnanswered = selected === undefined;
+
+        // 篩選條件判斷
+        let hiddenStyle = "";
+        if (currentFilter === "unanswered" && !isUnanswered) {
+          hiddenStyle = "display: none;";
+        } else if (currentFilter === "wrong" && isGraded && isCorrect) {
+          hiddenStyle = "display: none;";
+        }
+
+        // 卡片邊框狀態
+        let cardClass = "question-card";
+        let badgeHtml = "";
+        if (isGraded) {
+          if (isCorrect) {
+            cardClass += " graded-correct";
+            badgeHtml = `<span class="q-status-badge correct">✔ 答對</span>`;
+          } else if (isUnanswered) {
+            cardClass += " graded-wrong";
+            badgeHtml = `<span class="q-status-badge unanswered">⚠ 未作答</span>`;
+          } else {
+            cardClass += " graded-wrong";
+            badgeHtml = `<span class="q-status-badge wrong">✘ 答錯</span>`;
+          }
+        }
+
+        const optionsHtml = q.options.map((optText, idx) => {
+          const isThisSelected = selected === optText;
+          const isThisAnswer = optText === q.answer;
+
+          let labelClass = "option-label";
+          if (isThisSelected) labelClass += " selected";
+
+          if (isGraded) {
+            if (isThisAnswer) {
+              labelClass += " correct-answer";
+            } else if (isThisSelected && !isThisAnswer) {
+              labelClass += " wrong-selected";
+            }
+          }
+
+          // 安全編碼避免引號問題
+          const escapedOpt = optText.replace(/"/g, "&quot;");
+
+          return `
+            <label class="${labelClass}">
+              <input
+                type="radio"
+                name="q_${q.id}"
+                value="${escapedOpt}"
+                ${isThisSelected ? "checked" : ""}
+                onchange="selectOption(${q.id}, ${idx})"
+              />
+              <span class="opt-code">${OPTION_LABELS[idx]}</span>
+              <span class="opt-text">${optText}</span>
+            </label>
+          `;
+        }).join("");
+
+        // 找出目前正確答案對應的 (A)/(B)/(C)/(D) 標號
+        const correctIdx = q.options.indexOf(q.answer);
+        const correctLetter = OPTION_LABELS[correctIdx] || "";
+
+        return `
+          <article class="${cardClass}" id="q-card-${q.id}" style="${hiddenStyle}">
+            <div class="q-header">
+              <div class="q-title">
+                <span class="q-num">第 ${q.id} 題</span>
+                ${q.question}
+              </div>
+              <div class="q-meta">
+                ${badgeHtml}
+                <span class="q-source">[${q.source}]</span>
+              </div>
+            </div>
+
+            <div class="options-grid">
+              ${optionsHtml}
+            </div>
+
+            <div class="explanation-box ${explanationsShown ? "visible" : ""}" id="exp-${q.id}">
+              <div class="exp-title">💡 試題詳細說明（正確選項：${correctLetter}）</div>
+              <div>${q.explanation}</div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    // 選擇選項
+    function selectOption(questionId, optionIndex) {
+      const q = QUESTION_BANK.find(item => item.id === questionId);
+      if (!q) return;
+      userAnswers[questionId] = q.options[optionIndex];
+      updateProgress();
+
+      // 若已計分過，即時更新計分與畫面
+      if (isGraded) {
+        calculateAndRenderScore(false);
+      } else {
+        renderNavGrid();
+        renderQuestions();
+      }
+    }
+
+    // 更新頂部作答進度條
+    function updateProgress() {
+      const answeredCount = Object.keys(userAnswers).length;
+      const total = QUESTION_BANK.length;
+      const pct = Math.round((answeredCount / total) * 100);
+      document.getElementById("progressCount").textContent = `${answeredCount} / ${total} 題`;
+      document.getElementById("progressBar").style.width = `${pct}%`;
+    }
+
+    // 跳至指定題號
+    function scrollToQuestion(id) {
+      const card = document.getElementById(`q-card-${id}`);
+      if (card) {
+        if (card.style.display === "none") {
+          setFilter("all");
+        }
+        setTimeout(() => {
+          document.getElementById(`q-card-${id}`).scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 50);
+      }
+    }
+
+    // 切換題目篩選
+    function setFilter(filterType) {
+      currentFilter = filterType;
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-filter") === filterType);
+      });
+      renderQuestions();
+    }
+
+    // 執行計分按鈕
+    function gradeExam() {
+      isGraded = true;
+      calculateAndRenderScore(true);
+    }
+
+    function calculateAndRenderScore(scrollToTop) {
+      let correct = 0;
+      let wrong = 0;
+      let unanswered = 0;
+
+      QUESTION_BANK.forEach(q => {
+        const ans = userAnswers[q.id];
+        if (ans === undefined) {
+          unanswered++;
+        } else if (ans === q.answer) {
+          correct++;
+        } else {
+          wrong++;
+        }
+      });
+
+      // 滿分 100 分（每題 100/30 分，四捨五入至小數點後 1 位，若全對則為 100 分）
+      const rawScore = (correct / QUESTION_BANK.length) * 100;
+      const formattedScore = correct === QUESTION_BANK.length ? 100 : Math.round(rawScore * 10) / 10;
+
+      document.getElementById("scoreValue").textContent = formattedScore;
+      document.getElementById("correctCount").textContent = correct;
+      document.getElementById("wrongCount").textContent = wrong;
+      document.getElementById("unansweredCount").textContent = unanswered;
+
+      const feedbackEl = document.getElementById("scoreFeedback");
+      if (correct === 30) {
+        feedbackEl.textContent = "🎉 太厲害了！30 題全對滿分！您已完全掌握本章節的統測考點！";
+      } else if (formattedScore >= 80) {
+        feedbackEl.textContent = `👍 表現優異！答對 ${correct} 題，建議針對答錯或未作答的題目搭配「查看詳細說明」加強複習。`;
+      } else if (formattedScore >= 60) {
+        feedbackEl.textContent = `💪 通過及格標準！答對 ${correct} 題，可點擊上方「僅看錯題／未答」集中複習不熟的觀念。`;
+      } else {
+        feedbackEl.textContent = `📖 請繼續加油！目前答對 ${correct} 題（未作答 ${unanswered} 題），建議解鎖「詳細說明」逐題釐清 OSI 七層與網路協定觀念。`;
+      }
+
+      document.getElementById("scoreDashboard").classList.add("active");
+      document.getElementById("filterWrongBtn").style.display = "inline-block";
+
+      renderNavGrid();
+      renderQuestions();
+
+      if (scrollToTop) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+
+    // 處理「查看詳細說明（密碼保護）」按鈕
+    function handleExplanationButton() {
+      if (isUnlocked) {
+        explanationsShown = !explanationsShown;
+        updateExplainButtonText();
+        renderQuestions();
+      } else {
+        openPasswordModal();
+      }
+    }
+
+    function updateExplainButtonText() {
+      const btn = document.getElementById("explainBtn");
+      if (!isUnlocked) {
+        btn.innerHTML = "🔒 查看詳細說明（密碼保護）";
+      } else if (explanationsShown) {
+        btn.innerHTML = "🔓 隱藏詳細說明";
+      } else {
+        btn.innerHTML = "🔓 顯示詳細說明（已解鎖）";
+      }
+    }
+
+    function openPasswordModal() {
+      const modal = document.getElementById("passwordModal");
+      const input = document.getElementById("passwordInput");
+      const err = document.getElementById("passwordError");
+      err.style.display = "none";
+      input.value = "";
+      modal.classList.add("open");
+      setTimeout(() => input.focus(), 80);
+    }
+
+    function closePasswordModal() {
+      document.getElementById("passwordModal").classList.remove("open");
+    }
+
+    function verifyPassword() {
+      const input = document.getElementById("passwordInput");
+      const err = document.getElementById("passwordError");
+      if (input.value.trim() === PASSWORD_SECRET) {
+        isUnlocked = true;
+        explanationsShown = true;
+        closePasswordModal();
+        updateExplainButtonText();
+        renderQuestions();
+      } else {
+        err.style.display = "block";
+        input.select();
+      }
+    }
+
+    // 支援在密碼框按 Enter 鍵直接驗證，按 Escape 關閉
+    document.getElementById("passwordInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        verifyPassword();
+      } else if (e.key === "Escape") {
+        closePasswordModal();
+      }
+    });
+
+    // 重新洗牌所有選項並重考
+    function shuffleAndReset() {
+      QUESTION_BANK.forEach(q => {
+        for (let i = q.options.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = q.options[i];
+          q.options[i] = q.options[j];
+          q.options[j] = temp;
+        }
+      });
+
+      userAnswers = {};
+      isGraded = false;
+      currentFilter = "all";
+      document.getElementById("scoreDashboard").classList.remove("active");
+      document.getElementById("filterWrongBtn").style.display = "none";
+      setFilter("all");
+      updateProgress();
+      renderNavGrid();
+      renderQuestions();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // 啟動系統
+    initExam();
+  </script>
+</body>
+</html>
+
